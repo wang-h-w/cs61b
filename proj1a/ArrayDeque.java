@@ -16,17 +16,6 @@ public class ArrayDeque<T> {
         nextLast = 5;
     }
 
-    /** Creates a deep copy of other. */
-    public ArrayDeque(ArrayDeque other) {
-        array = (T[]) new Object[INIT_CAPACITY];
-        size = 0;
-        nextFirst = 4;
-        nextLast = 5;
-        for (int i = 0; i < other.size(); i++) {
-            addLast((T) other.get(i));
-        }
-    }
-
     /** Helper method: minus one of the index. */
     private int minusOne(int index) {
         index = index - 1;
@@ -113,12 +102,13 @@ public class ArrayDeque<T> {
             return null;
         }
         nextFirst = plusOne(nextFirst);
+        T first = array[nextFirst];
         array[nextFirst] = null;
         size -= 1;
 
         checkResize();
 
-        return array[plusOne(nextFirst)];
+        return first;
     }
 
     /** Removes and returns the item at the back of the deque.
@@ -128,12 +118,13 @@ public class ArrayDeque<T> {
             return null;
         }
         nextLast = minusOne(nextLast);
+        T last = array[nextLast];
         array[nextLast] = null;
         size -= 1;
 
         checkResize();
 
-        return array[minusOne(nextLast)];
+        return last;
     }
 
     /** Gets the item at the given index, where 0 is the front,

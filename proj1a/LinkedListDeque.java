@@ -4,27 +4,17 @@ public class LinkedListDeque<T> {
 
     /** Create an empty linked list deque. */
     public LinkedListDeque() {
-        sentinel = new Node(null);
+        sentinel = new Node(null, null,null);
         sentinel.prev = sentinel;
         sentinel.next = sentinel;
         size = 0;
-    }
-
-    /** Create a deep copy of other. */
-    public LinkedListDeque(LinkedListDeque other) {
-        sentinel = new Node(null);
-        sentinel.prev = sentinel;
-        sentinel.next = sentinel;
-        size = 0;
-        for (int i = 0; i < other.size(); i += 1) {
-            addLast((T) other.get(i));
-        }
     }
 
     /** Adds an item of type T to the front of the deque. */
     public void addFirst(T item) {
-        sentinel.next = new Node(sentinel, item, sentinel.next);
-        sentinel.next.next.prev = sentinel.next;
+        Node node = new Node(sentinel, item, sentinel.next);
+        sentinel.next.prev = node;
+        sentinel.next = node;
         size += 1;
         if (size == 1) {
             sentinel.prev = sentinel.next;
@@ -33,9 +23,13 @@ public class LinkedListDeque<T> {
 
     /** Adds an item of type T to the back of the deque. */
     public void addLast(T item) {
-        sentinel.prev = new Node(sentinel.prev, item, sentinel);
-        sentinel.prev.prev.next = sentinel.prev;
+        Node node = new Node(sentinel.prev, item, sentinel);
+        sentinel.prev.next = node;
+        sentinel.prev = node;
         size += 1;
+        if (size == 1) {
+            sentinel.next = sentinel.prev;
+        }
     }
 
     /** Returns true if deque is empty, false otherwise. */
@@ -63,19 +57,21 @@ public class LinkedListDeque<T> {
     /** Removes and returns the item at the front of the deque.
      *  If no such item exists, returns null. */
     public T removeFirst() {
+        T first = sentinel.next.item;
         sentinel.next = sentinel.next.next;
         sentinel.next.prev = sentinel;
         size -= 1;
-        return sentinel.next.item;
+        return first;
     }
 
     /** Removes and returns the item at the back of the deque.
      *  If no such item exists, returns null. */
     public T removeLast() {
+        T last = sentinel.prev.item;
         sentinel.prev = sentinel.prev.prev;
         sentinel.prev.next = sentinel;
         size -= 1;
-        return sentinel.prev.item;
+        return last;
     }
 
     /** Gets the item at the given index, where 0 is the front,
@@ -119,10 +115,6 @@ public class LinkedListDeque<T> {
             prev = p;
             item = t;
             next = n;
-        }
-
-        Node(T t) {
-            item = t;
         }
     }
 }
