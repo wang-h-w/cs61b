@@ -105,6 +105,9 @@ public class ArrayDeque<T> {
         T first = array[nextFirst];
         array[nextFirst] = null;
         size -= 1;
+        if (size < 0) {
+            size = 0;
+        }
 
         checkResize();
 
@@ -121,6 +124,9 @@ public class ArrayDeque<T> {
         T last = array[nextLast];
         array[nextLast] = null;
         size -= 1;
+        if (size < 0) {
+            size = 0;
+        }
 
         checkResize();
 

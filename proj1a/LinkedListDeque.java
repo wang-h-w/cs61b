@@ -4,7 +4,7 @@ public class LinkedListDeque<T> {
 
     /** Create an empty linked list deque. */
     public LinkedListDeque() {
-        sentinel = new Node(null, null,null);
+        sentinel = new Node(null, null, null);
         sentinel.prev = sentinel;
         sentinel.next = sentinel;
         size = 0;
@@ -61,6 +61,9 @@ public class LinkedListDeque<T> {
         sentinel.next = sentinel.next.next;
         sentinel.next.prev = sentinel;
         size -= 1;
+        if (size < 0) {
+            size = 0;
+        }
         return first;
     }
 
@@ -71,6 +74,9 @@ public class LinkedListDeque<T> {
         sentinel.prev = sentinel.prev.prev;
         sentinel.prev.next = sentinel;
         size -= 1;
+        if (size < 0) {
+            size = 0;
+        }
         return last;
     }
 
