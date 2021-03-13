@@ -13,8 +13,8 @@ public class TestOffByOne {
         assertTrue(offByOne.equalChars('g', 'f'));
         assertTrue(offByOne.equalChars('&', '%')); // special case
 
-        assertFalse(offByOne.equalChars('a','c'));
-        assertFalse(offByOne.equalChars('q','d'));
-        assertFalse(offByOne.equalChars('a','A')); // special case
+        assertFalse(offByOne.equalChars('a', 'c'));
+        assertFalse(offByOne.equalChars('q', 'd'));
+        assertFalse(offByOne.equalChars('a', 'A')); // special case
     }
 }

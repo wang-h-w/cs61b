@@ -1,5 +1,3 @@
-import java.util.Collections;
-
 public class Palindrome {
     /** Given a String, wordToDeque should return a Deque
      *  where the characters appear in the same order as

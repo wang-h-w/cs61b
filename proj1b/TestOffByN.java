@@ -10,8 +10,8 @@ public class TestOffByN {
         assertTrue(offByN.equalChars('i', 'f'));
         assertTrue(offByN.equalChars('&', ')')); // special case
 
-        assertFalse(offByN.equalChars('a','c'));
-        assertFalse(offByN.equalChars('q','q'));
-        assertFalse(offByN.equalChars('a','A')); // special case
+        assertFalse(offByN.equalChars('a', 'c'));
+        assertFalse(offByN.equalChars('q', 'q'));
+        assertFalse(offByN.equalChars('a', 'A')); // special case
     }
 }
