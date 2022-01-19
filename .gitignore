@@ -49,4 +49,4 @@ $RECYCLE.BIN/
 *.msp
 *.lnk
 .idea/
-/.out
+.out/
