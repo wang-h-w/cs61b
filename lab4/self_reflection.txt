@@ -8,7 +8,7 @@ A:
 
 Q: What's something you felt proud of in your code, if anything?
 
-A:
+A: I can use Java!
 
 Q: What's something that was particularly inelegant in your code, if anything?
 
