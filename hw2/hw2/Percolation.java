@@ -10,6 +10,8 @@ public class Percolation {
     private final int btm;
     private final int[] grid;
     private final WeightedQuickUnionUF uf;
+    private final WeightedQuickUnionUF ufWithoutBtm;
+    private final int[][] surrounding;
     private int numOpen;
 
     // create N-by-N grid, with all sites initially blocked
@@ -26,6 +28,8 @@ public class Percolation {
         }
 
         this.uf = new WeightedQuickUnionUF(N * N + 2);
+        this.ufWithoutBtm = new WeightedQuickUnionUF(N * N + 1);
+        this.surrounding = new int[][] {{-1, 0}, {0, -1}, {1, 0}, {0, 1}};
         this.top = N * N;
         this.btm = N * N + 1;
     }
@@ -45,28 +49,19 @@ public class Percolation {
         int center = xyTo1D(row, col);
         if (row == 0) {
             uf.union(center, top);
+            ufWithoutBtm.union(center, top);
         }
         if (row == N - 1) {
             uf.union(center, btm);
         }
-        if (testInput(row - 1, col)) {
-            if (isOpen(row - 1, col)) {
-                uf.union(center, xyTo1D(row - 1, col));
-            }
-        }
-        if (testInput(row, col - 1)) {
-            if (isOpen(row, col - 1)) {
-                uf.union(center, xyTo1D(row, col - 1));
-            }
-        }
-        if (testInput(row + 1, col)) {
-            if (isOpen(row + 1, col)) {
-                uf.union(center, xyTo1D(row + 1, col));
-            }
-        }
-        if (testInput(row, col + 1)) {
-            if (isOpen(row, col + 1)) {
-                uf.union(center, xyTo1D(row, col + 1));
+        for (int[] s : surrounding) {
+            int adjRow = row + s[0];
+            int adjCol = col + s[1];
+            if (testInput(adjRow, adjCol)) {
+                if (isOpen(adjRow, adjCol)) {
+                    uf.union(center, xyTo1D(adjRow, adjCol));
+                    ufWithoutBtm.union(center, xyTo1D(adjRow, adjCol));
+                }
             }
         }
     }
@@ -97,7 +92,7 @@ public class Percolation {
         if (!testInput(row, col)) {
             throw new IndexOutOfBoundsException();
         }
-        return uf.connected(top, xyTo1D(row, col));
+        return ufWithoutBtm.connected(top, xyTo1D(row, col));
     }
 
     // number of open sites
