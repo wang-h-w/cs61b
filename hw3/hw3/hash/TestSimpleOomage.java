@@ -1,9 +1,7 @@
 package hw3.hash;
 
 import org.junit.Test;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 
 import java.util.Set;
@@ -25,10 +23,20 @@ public class TestSimpleOomage {
 
     @Test
     public void testHashCodePerfect() {
-        /* TODO: Write a test that ensures the hashCode is perfect,
-          meaning no two SimpleOomages should EVER have the same
-          hashCode UNLESS they have the same red, blue, and green values!
-         */
+        Set<Integer> hashCodeSet = new HashSet<>();
+        for (int i = 0; i <= 51; i++) {
+            for (int j = 0; j <= 51; j++) {
+                for (int k = 0; k <= 51; k++) {
+                    int r = i * 5;
+                    int g = j * 5;
+                    int b = k * 5;
+                    SimpleOomage other = new SimpleOomage(r, g, b);
+                    int hashCode = other.hashCode();
+                    assertFalse(hashCodeSet.contains(hashCode));
+                    hashCodeSet.add(hashCode);
+                }
+            }
+        }
     }
 
     @Test
@@ -42,7 +50,6 @@ public class TestSimpleOomage {
         assertNotEquals(ooA, "ketchup");
     }
 
-    /*
     @Test
     public void testHashCodeAndEqualsConsistency() {
         SimpleOomage ooA = new SimpleOomage(5, 10, 20);
@@ -50,10 +57,9 @@ public class TestSimpleOomage {
         HashSet<SimpleOomage> hashSet = new HashSet<>();
         hashSet.add(ooA);
         assertTrue(hashSet.contains(ooA2));
-    }*/
+    }
 
-    /* TODO: Uncomment this test after you finish haveNiceHashCode Spread in OomageTestUtility */
-    /*@Test
+    @Test
     public void testRandomOomagesHashCodeSpread() {
         List<Oomage> oomages = new ArrayList<>();
         int N = 10000;
@@ -63,7 +69,7 @@ public class TestSimpleOomage {
         }
 
         assertTrue(OomageTestUtility.haveNiceHashCodeSpread(oomages, 10));
-    }*/
+    }
 
     /** Calls tests for SimpleOomage. */
     public static void main(String[] args) {
