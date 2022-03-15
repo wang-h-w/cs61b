@@ -23,7 +23,6 @@ public class Board implements WorldState {
      * @return value of tile at row i, column j (or 0 if blank)
      */
     public int tileAt(int i, int j) {
-        int N = size();
         if (!(i >= 0 && i <= N - 1 && j >= 0 && j <= N - 1)) {
             throw new IndexOutOfBoundsException();
         }
@@ -123,9 +122,10 @@ public class Board implements WorldState {
         if (this == y) {
             return true;
         }
-        if (!(y instanceof Board b)) {
+        if (!(y instanceof Board)) {
             return false;
         }
+        Board b = (Board) y;
         if (this.N != b.N) {
             return false;
         }
@@ -144,11 +144,10 @@ public class Board implements WorldState {
      */
     public String toString() {
         StringBuilder s = new StringBuilder();
-        int N = size();
         s.append(N + "\n");
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < N; j++) {
-                s.append(String.format("%2d ", tileAt(i,j)));
+                s.append(String.format("%2d ", tileAt(i, j)));
             }
             s.append("\n");
         }

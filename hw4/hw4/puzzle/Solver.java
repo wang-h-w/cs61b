@@ -8,9 +8,9 @@ import java.util.Comparator;
 
 public class Solver {
 
-    public List<WorldState> solution;  // for solution()
-    public Map<WorldState, Integer> cache;
-    public MinPQ<SearchNode> minPQ = new MinPQ<>(new SearchNodeComparator());
+    private List<WorldState> solution;  // for solution()
+    private Map<WorldState, Integer> cache;
+    private MinPQ<SearchNode> minPQ = new MinPQ<>(new SearchNodeComparator());
 
     /**
      * Constructor which solves the puzzle, computing
@@ -69,7 +69,7 @@ public class Solver {
         private final int numMoves;
         private final SearchNode prevSearch;
 
-        public SearchNode(WorldState w, int n, SearchNode s) {
+        SearchNode(WorldState w, int n, SearchNode s) {
             worldState = w;
             numMoves = n;
             prevSearch = s;
@@ -79,9 +79,9 @@ public class Solver {
     private class SearchNodeComparator implements Comparator<SearchNode> {
         @Override
         public int compare(SearchNode s1, SearchNode s2) {
-            int s1_total = s1.numMoves + s1.worldState.estimatedDistanceToGoal();
-            int s2_total = s2.numMoves + s2.worldState.estimatedDistanceToGoal();
-            return Integer.compare(s1_total, s2_total);
+            int s1Total = s1.numMoves + s1.worldState.estimatedDistanceToGoal();
+            int s2Total = s2.numMoves + s2.worldState.estimatedDistanceToGoal();
+            return Integer.compare(s1Total, s2Total);
         }
 
         // Optimization
