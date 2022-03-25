@@ -71,14 +71,16 @@ public class MergeSort {
         }
         Queue<Item> itemsLeft = new Queue<>();
         Queue<Item> itemsRight = new Queue<>();
-        int n = items.size();
-        for (int i = 0; i < n; i++) {
-            if (i < n / 2) {
-                itemsLeft.enqueue(items.dequeue());
+        int n = items.size() / 2;
+        for (Item i: items) {
+            if (n > 0) {
+                itemsLeft.enqueue(i);
             } else {
-                itemsRight.enqueue(items.dequeue());
+                itemsRight.enqueue(i);
             }
+            n -= 1;
         }
+
         return mergeSortedQueues(mergeSort(itemsLeft), mergeSort(itemsRight));
     }
 
@@ -101,8 +103,8 @@ public class MergeSort {
         nums.enqueue(1);
         nums.enqueue(-2);
 
-        display(nums);
         Queue<Integer> numsSorted = mergeSort(nums);
+        display(nums);
         display(numsSorted);
 
         // String
@@ -114,8 +116,8 @@ public class MergeSort {
         s.enqueue("Best");
         s.enqueue("Guy");
 
-        display(s);
         Queue<String> sSorted = mergeSort(s);
+        display(s);
         display(sSorted);
     }
 }
