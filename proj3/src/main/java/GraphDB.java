@@ -6,7 +6,12 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.List;
+import java.util.LinkedList;
 
 /**
  * Graph for storing all of the intersection (vertex) and road (edge) information.
@@ -18,12 +23,13 @@ import java.util.ArrayList;
  * @author Alan Yao, Josh Hug
  */
 public class GraphDB {
-    /** Your instance variables for storing the graph. You should consider
-     * creating helper classes, e.g. Node, Edge, etc. */
+    Map<Long, Node> nodes = new HashMap<>(); // id -> Node
+    Map<Long, Set<Long>> adj = new HashMap<>(); // id -> neighbors' id
+    Set<Long> isolate = new HashSet<>(); // remove nodes without connections
+    KdTree kd = new KdTree();
 
     /**
-     * Example constructor shows how to create and start an XML parser.
-     * You do not need to modify this constructor, but you're welcome to do so.
+     * Database constructor (based on graph).
      * @param dbPath Path to the XML file to be parsed.
      */
     public GraphDB(String dbPath) {
@@ -43,6 +49,49 @@ public class GraphDB {
     }
 
     /**
+     * Add node to the graph.
+     * @param n Node waiting to be added.
+     */
+    void addNode(Node n) {
+        if (nodes.containsKey(n.id)) {
+            return;
+        }
+        this.nodes.put(n.id, n);
+        this.adj.put(n.id, new HashSet<>());
+        this.isolate.add(n.id);
+    }
+
+    /**
+     * If node's id doesn't exist in current graph, throw IllegalArgumentException.
+     * @param id Node's id waiting to be validated.
+     */
+    private void validateNode(long id) {
+        if (!this.nodes.containsKey(id)) {
+            throw new IllegalArgumentException("Node" + id + "doesn't exist in current graph.");
+        }
+    }
+
+    /**
+     * Add edge to the graph.
+     * @param e Edge waiting to be added.
+     */
+    void addEdge(Edge e) {
+        if (e.nds.isEmpty()) {
+            return;
+        }
+        for (int i = 0; i < e.nds.size() - 1; i++) {
+            long idFrom = e.nds.get(i);
+            long idTo = e.nds.get(i + 1);
+            validateNode(idFrom);
+            validateNode(idTo);
+            this.adj.get(idFrom).add(idTo);
+            this.adj.get(idTo).add(idFrom);
+            this.isolate.remove(idFrom);
+            this.isolate.remove(idTo);
+        }
+    }
+
+    /**
      * Helper to process strings into their "cleaned" form, ignoring punctuation and capitalization.
      * @param s Input string.
      * @return Cleaned string.
@@ -57,7 +106,13 @@ public class GraphDB {
      *  we can reasonably assume this since typically roads are connected.
      */
     private void clean() {
-        // TODO: Your code here.
+        for (long iso: this.isolate) {
+            this.nodes.remove(iso);
+            this.adj.remove(iso);
+        }
+        for (long key: this.nodes.keySet()) {
+            this.kd.add(nodes.get(key));
+        }
     }
 
     /**
@@ -65,8 +120,7 @@ public class GraphDB {
      * @return An iterable of id's of all vertices in the graph.
      */
     Iterable<Long> vertices() {
-        //YOUR CODE HERE, this currently returns only an empty list.
-        return new ArrayList<Long>();
+        return this.nodes.keySet();
     }
 
     /**
@@ -75,7 +129,7 @@ public class GraphDB {
      * @return An iterable of the ids of the neighbors of v.
      */
     Iterable<Long> adjacent(long v) {
-        return null;
+        return this.adj.get(v);
     }
 
     /**
@@ -136,7 +190,8 @@ public class GraphDB {
      * @return The id of the node in the graph closest to the target.
      */
     long closest(double lon, double lat) {
-        return 0;
+        Node near = kd.nearest(new Node(-1, lon, lat));
+        return near.id;
     }
 
     /**
@@ -145,7 +200,7 @@ public class GraphDB {
      * @return The longitude of the vertex.
      */
     double lon(long v) {
-        return 0;
+        return this.nodes.get(v).lon;
     }
 
     /**
@@ -154,6 +209,42 @@ public class GraphDB {
      * @return The latitude of the vertex.
      */
     double lat(long v) {
-        return 0;
+        return this.nodes.get(v).lat;
+    }
+
+    /**
+     * Helper class to construct a node.
+     * Have id, lon, lat and extraInfo (e.g. name).
+     */
+    static class Node {
+        long id;
+        double lon;
+        double lat;
+        Map<String, String> extraInfo;
+
+        Node(long id, double lon, double lat) {
+            this.id = id;
+            this.lon = lon;
+            this.lat = lat;
+            this.extraInfo = new HashMap<>();
+        }
+    }
+
+    /**
+     * Helper class to construct an edge.
+     * Have nds and extraInfo (e.g. highway).
+     */
+    static class Edge {
+        List<Long> nds;
+        Map<String, String> extraInfo;
+
+        Edge() {
+            this.nds = new LinkedList<>();
+            this.extraInfo = new HashMap<>();
+        }
+
+        public void addNodes(long nd) {
+            this.nds.add(nd);
+        }
     }
 }
