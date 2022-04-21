@@ -25,7 +25,11 @@ public class Router {
      */
     public static List<Long> shortestPath(GraphDB g, double stlon, double stlat,
                                           double destlon, double destlat) {
-        return null; // FIXME
+        long startID = g.closest(stlon, stlat);
+        long endID = g.closest(destlon, destlat);
+        AStar algo = new AStar(g, startID, endID);
+
+        return algo.getPath();
     }
 
     /**

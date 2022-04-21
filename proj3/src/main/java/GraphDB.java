@@ -23,10 +23,10 @@ import java.util.LinkedList;
  * @author Alan Yao, Josh Hug
  */
 public class GraphDB {
-    Map<Long, Node> nodes = new HashMap<>(); // id -> Node
-    Map<Long, Set<Long>> adj = new HashMap<>(); // id -> neighbors' id
-    Set<Long> isolate = new HashSet<>(); // remove nodes without connections
-    KdTree kd = new KdTree();
+    private Map<Long, Node> nodes = new HashMap<>(); // id -> Node
+    private Map<Long, Set<Long>> adj = new HashMap<>(); // id -> neighbors' id
+    private Set<Long> isolate = new HashSet<>(); // remove nodes without connections
+    private KdTree kd = new KdTree();
 
     /**
      * Database constructor (based on graph).
