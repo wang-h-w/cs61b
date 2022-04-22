@@ -1,3 +1,4 @@
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -41,7 +42,108 @@ public class Router {
      * route.
      */
     public static List<NavigationDirection> routeDirections(GraphDB g, List<Long> route) {
-        return null; // FIXME
+        List<NavigationDirection> directions = new LinkedList<>();
+        long prevNodeID;
+        long currNodeID;
+        long nextNodeID;
+        double sumDist = 0.0;
+
+        NavigationDirection start = new NavigationDirection();
+        start.direction = NavigationDirection.START;
+        start.way = getWayName(g, route.get(0), route.get(1));
+        prevNodeID = route.get(0);
+
+        for (int i = 1; i < route.size() - 1; i++) {
+            currNodeID = route.get(i);
+            nextNodeID = route.get(i + 1);
+
+            // Now, you are in the current node!!!!!
+            if (wayChanged(g, prevNodeID, currNodeID, nextNodeID)) {
+                sumDist += g.distance(prevNodeID, currNodeID);
+                start.distance = sumDist;
+                directions.add(start);
+
+//                System.out.println(NavigationDirection.DIRECTIONS[start.direction]);
+//                System.out.println(start.way);
+//                System.out.println(start.distance);
+//                System.out.println("=======================");
+
+                start = new NavigationDirection();
+                start.direction = getDirection(g, prevNodeID, currNodeID, nextNodeID);
+                start.way = getWayName(g, currNodeID, nextNodeID);
+                sumDist = 0.0;
+                prevNodeID = currNodeID;
+            } else {
+                sumDist += g.distance(prevNodeID, currNodeID);
+                prevNodeID = currNodeID;
+            }
+        }
+
+        start.distance = sumDist + g.distance(prevNodeID, route.get(route.size() - 1));
+        directions.add(start);
+
+        return directions;
+    }
+
+    private static boolean wayChanged(GraphDB g, long prevNodeID,
+                                      long currNodeID, long nextNodeID) {
+        long id1 = getWayID(g, prevNodeID, currNodeID);
+        long id2 = getWayID(g, currNodeID, nextNodeID);
+
+        String name1 = getWayNameFromID(g, id1);
+        String name2 = getWayNameFromID(g, id2);
+
+        return id1 != id2 && !name1.equals(name2);
+    }
+
+    private static String getWayName(GraphDB g, long prevNodeID, long currNodeID) {
+        long wayID = getWayID(g, prevNodeID, currNodeID);
+        return getWayNameFromID(g, wayID);
+    }
+
+    private static String getWayNameFromID(GraphDB g, long wayID) {
+        return g.wayNameMap().getOrDefault(wayID, "");
+    }
+
+    private static long getWayID(GraphDB g, long prevNodeID, long currNodeID) {
+        List<Long> prevEdges = g.nodesMap().get(prevNodeID).edge;
+        List<Long> currEdges = g.nodesMap().get(currNodeID).edge;
+
+        prevEdges.retainAll(currEdges);
+
+        if (!prevEdges.isEmpty()) {
+            return prevEdges.get(0);
+        } else {
+            return -1;
+        }
+    }
+
+    private static int getDirection(GraphDB g, long prevNodeID, long currNodeID, long nextNodeID) {
+        double bearCurr = g.bearing(prevNodeID, currNodeID);
+        double bearNext = g.bearing(currNodeID, nextNodeID);
+        double relativeBearing = bearNext - bearCurr;
+
+        if (relativeBearing > 180) {
+            relativeBearing -= 360;
+        } else if (relativeBearing < -180) {
+            relativeBearing += 360;
+        }
+
+        if (relativeBearing < -100) {
+            return NavigationDirection.SHARP_LEFT;
+        } else if (relativeBearing < -30) {
+            return NavigationDirection.LEFT;
+        } else if (relativeBearing < -15) {
+            return NavigationDirection.SLIGHT_LEFT;
+        } else if (relativeBearing < 15) {
+            return NavigationDirection.STRAIGHT;
+        } else if (relativeBearing < 30) {
+            return NavigationDirection.SLIGHT_RIGHT;
+        } else if (relativeBearing < 100) {
+            return NavigationDirection.RIGHT;
+        } else {
+            return NavigationDirection.SHARP_RIGHT;
+        }
     }
 
 

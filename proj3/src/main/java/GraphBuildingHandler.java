@@ -85,7 +85,7 @@ public class GraphBuildingHandler extends DefaultHandler {
         } else if (qName.equals("way")) {
             /* We encountered a new <way...> tag. */
             activeState = "way";
-            this.edge = new GraphDB.Edge();
+            this.edge = new GraphDB.Edge(Long.parseLong(attributes.getValue("id")));
             this.edgeValidFlag = false;
 //            System.out.println("Beginning a way...");
 

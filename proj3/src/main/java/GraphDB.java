@@ -1,5 +1,4 @@
 import org.xml.sax.SAXException;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -23,10 +22,11 @@ import java.util.LinkedList;
  * @author Alan Yao, Josh Hug
  */
 public class GraphDB {
-    private Map<Long, Node> nodes = new HashMap<>(); // id -> Node
-    private Map<Long, Set<Long>> adj = new HashMap<>(); // id -> neighbors' id
-    private Set<Long> isolate = new HashSet<>(); // remove nodes without connections
-    private KdTree kd = new KdTree();
+    private final Map<Long, Node> nodes = new HashMap<>(); // id -> Node
+    private final Map<Long, Set<Long>> adj = new HashMap<>(); // id -> neighbors' id
+    private final Set<Long> isolate = new HashSet<>(); // remove nodes without connections
+    private final KdTree kd = new KdTree();
+    private final Map<Long, String> wayNameDict = new HashMap<>();
 
     /**
      * Database constructor (based on graph).
@@ -79,6 +79,9 @@ public class GraphDB {
         if (e.nds.isEmpty()) {
             return;
         }
+        if (e.extraInfo.containsKey("name")) {
+            this.wayNameDict.put(e.wayID, e.extraInfo.get("name"));
+        }
         for (int i = 0; i < e.nds.size() - 1; i++) {
             long idFrom = e.nds.get(i);
             long idTo = e.nds.get(i + 1);
@@ -86,9 +89,19 @@ public class GraphDB {
             validateNode(idTo);
             this.adj.get(idFrom).add(idTo);
             this.adj.get(idTo).add(idFrom);
+            this.nodes.get(idFrom).addEdgeInfo(e.wayID);
+            this.nodes.get(idTo).addEdgeInfo(e.wayID);
             this.isolate.remove(idFrom);
             this.isolate.remove(idTo);
         }
+    }
+
+    Map<Long, Node> nodesMap() {
+        return this.nodes;
+    }
+
+    Map<Long, String> wayNameMap() {
+        return this.wayNameDict;
     }
 
     /**
@@ -221,12 +234,18 @@ public class GraphDB {
         double lon;
         double lat;
         Map<String, String> extraInfo;
+        List<Long> edge;
 
         Node(long id, double lon, double lat) {
             this.id = id;
             this.lon = lon;
             this.lat = lat;
             this.extraInfo = new HashMap<>();
+            this.edge = new LinkedList<>();
+        }
+
+        public void addEdgeInfo(long way) {
+            this.edge.add(way);
         }
     }
 
@@ -235,10 +254,12 @@ public class GraphDB {
      * Have nds and extraInfo (e.g. highway).
      */
     static class Edge {
+        long wayID;
         List<Long> nds;
         Map<String, String> extraInfo;
 
-        Edge() {
+        Edge(long wayID) {
+            this.wayID = wayID;
             this.nds = new LinkedList<>();
             this.extraInfo = new HashMap<>();
         }
