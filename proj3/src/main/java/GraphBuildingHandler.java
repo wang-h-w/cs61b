@@ -112,7 +112,10 @@ public class GraphBuildingHandler extends DefaultHandler {
         } else if (activeState.equals("node") && qName.equals("tag") && attributes.getValue("k")
                 .equals("name")) {
             /* While looking at a node, we found a <tag...> with k="name". */
-            this.lastNode.extraInfo.put(attributes.getValue("k"), attributes.getValue("v"));
+            GraphDB.Node n = new GraphDB.Node(lastNode.id, lastNode.lon, lastNode.lat);
+            n.extraInfo.put(attributes.getValue("k"), attributes.getValue("v"));
+            g.addNode(n);
+//            this.lastNode.extraInfo.put(attributes.getValue("k"), attributes.getValue("v"));
 //            System.out.println("Node's name: " + attributes.getValue("v"));
         }
     }
@@ -138,5 +141,4 @@ public class GraphBuildingHandler extends DefaultHandler {
 //            System.out.println("Finishing a way...");
         }
     }
-
 }

@@ -27,6 +27,7 @@ public class GraphDB {
     private final Set<Long> isolate = new HashSet<>(); // remove nodes without connections
     private final KdTree kd = new KdTree();
     private final Map<Long, String> wayNameDict = new HashMap<>();
+    private final Trie trie = new Trie();
 
     /**
      * Database constructor (based on graph).
@@ -53,12 +54,12 @@ public class GraphDB {
      * @param n Node waiting to be added.
      */
     void addNode(Node n) {
-        if (nodes.containsKey(n.id)) {
-            return;
-        }
         this.nodes.put(n.id, n);
         this.adj.put(n.id, new HashSet<>());
         this.isolate.add(n.id);
+        if (n.extraInfo.containsKey("name")) {
+            this.trie.add(cleanString(n.extraInfo.get("name")));
+        }
     }
 
     /**
@@ -104,6 +105,10 @@ public class GraphDB {
         return this.wayNameDict;
     }
 
+    List<String> getPrefix(String prefix) {
+        return this.trie.keyWithPrefix(prefix);
+    }
+
     /**
      * Helper to process strings into their "cleaned" form, ignoring punctuation and capitalization.
      * @param s Input string.
@@ -124,7 +129,7 @@ public class GraphDB {
             this.adj.remove(iso);
         }
         for (long key: this.nodes.keySet()) {
-            this.kd.add(nodes.get(key));
+            this.kd.add(this.nodes.get(key));
         }
     }
 
